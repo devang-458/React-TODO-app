@@ -1,10 +1,13 @@
+//index.js
+
 const {todo} = require("./db")
 const {createTodo, updateTodo} = require("./type")
-
+const cors = require("cors")
 const express = require("express")
 const app = express();
 
 app.use(express.json())
+app.use(cors({}))
 
 app.post("/todos", async function(req, res) {
     const createPayload = req.body;
@@ -48,7 +51,7 @@ app.get("/todos",async (req,res)=>{
     })
 })
 
-app.put("/complete",async (req,res)=>{
+app.put("/complete/:id",async (req,res)=>{
     const updatePayload = req.body;
     const parsedPayload = updateTodo.safeParse(updatePayload)
     if(!parsedPayload.success){
@@ -57,8 +60,8 @@ app.put("/complete",async (req,res)=>{
         })
         return;
     }
-    await todo.update({
-        _id: req.body.id
+    await todo.updateOne({
+        _id: req.params.id
     },{
         completed: true
     })
