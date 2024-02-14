@@ -1,11 +1,11 @@
 const mongoose = require("mongoose")
 
-mongoose.connect("")
+mongoose.connect("your mongoDb here")
 
 const todoSchema = mongoose.Schema({
     title: String,
     description: String,
-    comppleted: Boolean
+    completed: Boolean
 })
 
 

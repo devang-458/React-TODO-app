@@ -1,30 +1,45 @@
+const {todo} = require("./db")
+const {createTodo, updateTodo} = require("./type")
+
 const express = require("express")
 const app = express();
-import { todo } from "./db";
-import { createTodo, updateTodo } from "./type";
 
 app.use(express.json())
 
-app.post("/todos", async function(req,res){
+app.post("/todos", async function(req, res) {
     const createPayload = req.body;
     const parsedPayload = createTodo.safeParse(createPayload);
-    if(!parsedPayload.success){
+
+    if (!parsedPayload.success) {
         res.status(411).json({
             msg: "you sent the wrong inputs"
-        })
+        });
         return;
     }
-    // put it in mongoDb
-    await todo.create({
+
+    // Explicitly set completed to false
+    const newTodo = {
         title: createPayload.title,
         description: createPayload.description,
         completed: false
-    })
+    };
 
-    res.json({
-        msg: "Todo created"
-    })
-})
+    try {
+        // Use create method to insert newTodo into the database
+        const createdTodo = await todo.create(newTodo);
+
+        res.json({
+            msg: "Todo created",
+            todo: createdTodo
+        });
+    } catch (error) {
+        console.error("Error creating todo:", error);
+        res.status(500).json({
+            msg: "Internal Server Error"
+        });
+    }
+});
+
 
 app.get("/todos",async (req,res)=>{
     const todos = await todo.find({})
